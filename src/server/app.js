@@ -7,6 +7,9 @@ const mongoose = require('mongoose');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// register route
+app.use('/api/v1', require('./routes'));
+
 async function startApp() {
   const mongoseInstance = await mongoose
     .connect(AppConfig.DB_URI, {

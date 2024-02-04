@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --watch ./src/server/**/*.js ./src/server/app.js",
     "prepare": "husky"
   },
@@ -16,9 +15,13 @@
     "ajv-formats": "^2.1.1",
     "dotenv": "^16.4.1",
     "express": "^4.18.2",
+    "moment": "^2.30.1",
     "mongoose": "^8.1.1",
     "mongoose-aggregate-paginate-v2": "^1.0.7",
-    "nunjucks": "^3.2.4"
+    "nodemailer": "^6.9.9",
+    "nunjucks": "^3.2.4",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.6.0",

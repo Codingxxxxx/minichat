@@ -49,7 +49,7 @@ const schema = new Schema({
 
 schema.plugin(require('mongoose-aggregate-paginate-v2'));
 
-const MessageModel = model(MongoCollection.VERIFICATION_TOKEN);
+const MessageModel = model(MongoCollection.MESSAGE, schema);
 
 module.exports = {
   MessageModel

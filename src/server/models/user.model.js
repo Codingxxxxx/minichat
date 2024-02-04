@@ -11,7 +11,8 @@ const schema = new Schema({
   displayName: {
     type: String,
     required: true,
-    maxLength: 15
+    maxLength: 15,
+    default: 'Annonymous'
   },
   password: {
     type: String
