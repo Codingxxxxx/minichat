@@ -6,7 +6,45 @@ const moment = require('moment');
 
 router.post('/signin', async (req, res, next) => {
   try {
+    if (!Validator.validateSignIn(req.body)) return res.status(400).json({
+      code: API.ERROR_VALIDATION,
+      data: {
+        errors: Validator.validateSignIn.errors
+      }
+    })
+
+    const user = await UserService.getUserByUsername(req.body.username);
     
+    if (!user) return res.status(400).json({
+      code: API.ERROR_USER_INVALID
+    })
+
+    // check user password
+    const [derivedPassword, salt] = await Auth.hashPassword(req.body.password, user.salt);
+    
+    if (derivedPassword !== user.password) return res.status(400).json({
+      code: API.ERROR_USER_INVALID
+    })
+
+    // create login history
+    await UserService.addLoginHistory(user._id, {
+      loginAt: Date.now(),
+      ip: req.ip,
+      address: '',
+      userAgent: req.get('User-Agent')
+    })
+
+    const accessToken = await Auth.signJWT({ username: user.username });
+    const refreshToken = await Auth.signRefreshToken();
+
+    res.status(200).json({
+      data: {
+        auth: {
+          accessToken,
+          refreshToken
+        }
+      }
+    })
   } catch (error) {
     next(error);
   }
@@ -67,8 +105,14 @@ router.post('/signup', async (req, res, next) => {
 
 router.get('/verify', async (req, res, next) => {
   try {
-    if (!req.query.token) return res.status(400);
-    const { _id, userId } = await UserService.getUserByToken(req.query.token);
+    if (!req.query.token) return res.sendStatus(400);
+    const userVerificationRecord = await UserService.getUserByToken(req.query.token);
+
+    // invalid token
+    if (!userVerificationRecord) return res.sendStatus(400)
+    
+    const { _id, userId } = userVerificationRecord;
+
     await UserService.setUserIsVerified(userId, true);
     await UserService.removeVerificationToken(_id);
     res.status(200).json();

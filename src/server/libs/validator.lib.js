@@ -5,9 +5,11 @@ const ajv = new Ajv({
 require('ajv-formats').default(ajv);
 
 const {
-  SignupSchema
+  SignupSchema,
+  SigninSchema
 } = require('../schemas');
 
 module.exports = {
-  validateSignUp: ajv.compile(SignupSchema)
+  validateSignUp: ajv.compile(SignupSchema),
+  validateSignIn: ajv.compile(SigninSchema)
 }

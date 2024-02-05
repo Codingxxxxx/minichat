@@ -1,3 +1,4 @@
 module.exports = {
-  SignupSchema: require('./signup.schema')
+  SignupSchema: require('./signup.schema'),
+  SigninSchema: require('./signin.schema')
 }

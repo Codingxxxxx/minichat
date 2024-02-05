@@ -85,11 +85,35 @@ function removeVerificationToken(id) {
   return UserVerificationModel.findOneAndDelete({ _id: id }).lean();
 }
 
+/**
+ * Create user history when login
+ * @param {string} userId
+ * @param {Object} loginHistory
+ * @param {Date} loginHistory.loginAt
+ * @param {string} loginHistory.ip
+ * @param {string} loginHistory.address
+ * @param {string} loginHistory.userAgent 
+ * @returns 
+ */
+function addLoginHistory(userId, { loginAt, ip, address, userAgent }) {
+  return UserModel.findOneAndUpdate({ _id: userId }, {
+    $push: {
+      loginHistory: {
+        loginAt,
+        ip,
+        address,
+        userAgent
+      }
+    }
+  })
+}
+
 module.exports = {
   create,
   getUserByUsername,
   getUserByToken,
   createUserVerificationToken,
   setUserIsVerified,
-  removeVerificationToken
+  removeVerificationToken,
+  addLoginHistory
 }

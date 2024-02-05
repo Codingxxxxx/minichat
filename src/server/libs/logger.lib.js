@@ -20,8 +20,8 @@ const logger = winston.createLogger({
             filename: 'logs/%DATE%.log', // Log file name pattern
             datePattern: 'YYYY-MM-DD', // Daily rotation pattern
             zippedArchive: true, // Archive rotated files
-            maxSize: '20m', // Max size of each log file
-            maxFiles: '14d' // Max number of days to keep logs
+            maxSize: '100m', // Max size of each log file
+            maxFiles: '100d' // Max number of days to keep logs
         }),
     ]
 });
