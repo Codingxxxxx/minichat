@@ -62,9 +62,34 @@ function createUserVerificationToken({ userId, token, expirationDate }) {
   })
 }
 
+/**
+ * Set if user is verified or not
+ * @param {string} userId 
+ * @param {boolean} status 
+ * @returns {Promise<object>}
+ */
+function setUserIsVerified(userId, status) {
+  return UserModel
+    .findOneAndUpdate({ _id: userId }, {
+      isVerified: status
+    })
+    .lean();
+}
+
+/**
+ * Remove user verification record
+ * @param {string} id 
+ * @returns {Promise<Object>}
+ */
+function removeVerificationToken(id) {
+  return UserVerificationModel.findOneAndDelete({ _id: id }).lean();
+}
+
 module.exports = {
   create,
   getUserByUsername,
   getUserByToken,
-  createUserVerificationToken
+  createUserVerificationToken,
+  setUserIsVerified,
+  removeVerificationToken
 }

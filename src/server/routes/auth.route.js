@@ -65,4 +65,16 @@ router.post('/signup', async (req, res, next) => {
   }
 })
 
+router.get('/verify', async (req, res, next) => {
+  try {
+    if (!req.query.token) return res.status(400);
+    const { _id, userId } = await UserService.getUserByToken(req.query.token);
+    await UserService.setUserIsVerified(userId, true);
+    await UserService.removeVerificationToken(_id);
+    res.status(200).json();
+  } catch (error) {
+    next(error);
+  }
+})
+
 module.exports = router;
