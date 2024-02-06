@@ -1,4 +1,5 @@
 module.exports = {
-  ServerErrorHandle: require('./500.middleware'),
-  RequestLog: require('./request-log.middleware')
+  serverErrorHandle: require('./500.middleware'),
+  requestLog: require('./request-log.middleware'),
+  checkAuth: require('./auth.middleware')
 }

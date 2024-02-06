@@ -195,8 +195,10 @@ router.post('/revoke', async (req, res, next) => {
 
     res.status(200).json({
       data: {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken
+        auth: {
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken
+        }
       }
     })
   } catch (error) {

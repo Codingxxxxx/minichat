@@ -108,6 +108,15 @@ function addLoginHistory(userId, { loginAt, ip, address, userAgent }) {
   })
 }
 
+/**
+ * get a user by id
+ * @param {string} id user id 
+ * @returns 
+ */
+function getUserById(id) {
+  return UserModel.findById(id).select('_id username displayName avatar email isVerified status createdAt').lean();
+}
+
 module.exports = {
   create,
   getUserByUsername,
@@ -115,5 +124,6 @@ module.exports = {
   createUserVerificationToken,
   setUserIsVerified,
   removeVerificationToken,
-  addLoginHistory
+  addLoginHistory,
+  getUserById
 }
