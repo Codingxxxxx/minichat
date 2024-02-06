@@ -8,7 +8,15 @@ services:
     restart: always
     volumes:
       - mongo:/data/db
+  redis:
+    container_name: minichat-redis
+    image: redis:latest
+    ports:
+      - 6379:6379
+    restart: always
+    volumes:
+      - redis:/data
 
 volumes:
   mongo:
-    
+  redis:

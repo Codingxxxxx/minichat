@@ -3,5 +3,6 @@ module.exports = {
   Auth: require('./auth.lib'),
   Mail: require('./mail.lib'),
   Logger: require('./logger.lib'),
-  HTML: require('./html.lib')
+  HTML: require('./html.lib'),
+  RedisClient: require('./redis.lib')
 }

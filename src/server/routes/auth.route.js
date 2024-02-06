@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { Validator, Auth, Mail, Logger, HTML } = require('./../libs');
-const { API, AppConfig } = require('./../const');
+const { redisClient } = require('../libs').RedisClient;
+const { API, AppConfig, Redis } = require('./../const');
 const { UserService } = require('../services');
 const moment = require('moment');
 
@@ -116,6 +117,36 @@ router.get('/verify', async (req, res, next) => {
     await UserService.setUserIsVerified(userId, true);
     await UserService.removeVerificationToken(_id);
     res.status(200).json();
+  } catch (error) {
+    next(error);
+  }
+})
+
+router.post('/logout', async (req, res, next) => {
+  try {
+    const { accessToken, refreshToken } = req.body;
+    if (!accessToken || !refreshToken) return res.sendStatus(400);
+
+    // switch database
+    await redisClient.select(Redis.Database.JWT_CACHE);
+
+    const payloadRefreshToken = await Auth.decodeRefreshToken(refreshToken).catch(() => {}); // ignore error
+    
+    if (payloadRefreshToken) {
+      const expirationTime = moment.unix(payloadRefreshToken.exp);
+      const expiresIn = expirationTime.diff(moment(), 'seconds');
+      await redisClient.setEx(`jwt-refresh-${refreshToken}`, expiresIn, '');
+    }
+
+    const payloadAccessToken = await Auth.decodeJWT(accessToken).catch(() => {}); // also ignore error
+
+    if (payloadAccessToken) {
+      const expirationTime = moment.unix(payloadAccessToken.exp);
+      const expiresIn = expirationTime.diff(moment(), 'seconds');
+      await redisClient.setEx(`jwt-access-${accessToken}`, expiresIn, '');
+    }
+
+    res.sendStatus(200);
   } catch (error) {
     next(error);
   }

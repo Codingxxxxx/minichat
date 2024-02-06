@@ -17,12 +17,21 @@ const logger = winston.createLogger({
     ),
     transports: [
         new DailyRotateFile({
-            filename: 'logs/%DATE%.log', // Log file name pattern
+            filename: 'logs/error/%DATE%-error-warn.log', // Log file name pattern
             datePattern: 'YYYY-MM-DD', // Daily rotation pattern
             zippedArchive: true, // Archive rotated files
             maxSize: '100m', // Max size of each log file
-            maxFiles: '100d' // Max number of days to keep logs
+            maxFiles: '100d', // Max number of days to keep logs
+            level: 'warn'
         }),
+        new DailyRotateFile({
+          filename: 'logs/combined/%DATE%-combined.log', // Log file name pattern
+          datePattern: 'YYYY-MM-DD', // Daily rotation pattern
+          zippedArchive: true, // Archive rotated files
+          maxSize: '100m', // Max size of each log file
+          maxFiles: '100d', // Max number of days to keep logs
+          level: 'info'
+      })
     ]
 });
 

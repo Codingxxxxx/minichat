@@ -2,6 +2,7 @@ console.table(require('dotenv').config().parsed);
 const express = require('express');
 const app = express();
 const { AppConfig } = require('./const');
+const { RedisClient, Logger } = require('./libs');
 const mongoose = require('mongoose');
 
 app.use(express.urlencoded({ extended: true }));
@@ -17,16 +18,49 @@ async function startApp() {
       minPoolSize: 2
     })
     .catch(error => {
-      console.log('Failed to connect to database');
-      console.error(error);
+      Logger.error('failed to connect to mongodb', error);
+    });
+
+  await RedisClient
+    .connect()
+    .catch(error => {
+      Logger.error('failed to connect to redis', error);
     });
   
   if (!mongoseInstance) return;
 
+  mongoose.connection.on('connected', () => {
+    Logger.info('Mongodb connected');
+  });
+  
+  // Connection error event
+  mongoose.connection.on('error', (err) => {
+    Logger.error('Mongodb error', err);
+  });
+  
+  // Disconnected event
+  mongoose.connection.on('disconnected', () => {
+    Logger.warning('Mongodb disconnected');
+  });
+  
+
   app.listen(AppConfig.PORT, AppConfig.HOST, () => {
     console.log('App started!');
   });
-  
+
+  process.on('SIGINT', async () => {
+    await mongoose.connection.close();
+    await redisClient.quit();
+    Logger.warning('Node server closed');
+    process.exit(1);
+  })
+
+  process.on('uncaughtException', async (error, origin) => {
+    await mongoose.connection.close();
+    await redisClient.quit();
+    Logger.error('Unexpect error on node server ' + origin, error);
+    process.exit(1);
+  })
 }
 
 startApp();
