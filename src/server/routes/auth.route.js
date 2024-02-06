@@ -87,7 +87,7 @@ router.post('/signup', async (req, res, next) => {
       username,
       verificationLink: AppConfig.USER_VERIFICATION_URL + `?token=${token}`
     }, (error, html) => {
-      if (error) return Logger.error(`failed to render html template ${templatePath}`, error);
+      if (error) return Logger.error(`failed to render html template`, error);
       Mail.sendMail({
         to: email.trim(),
         subject: 'Account verification required',
