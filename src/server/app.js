@@ -4,12 +4,15 @@ const app = express();
 const { AppConfig } = require('./const');
 const { RedisClient, Logger } = require('./libs');
 const mongoose = require('mongoose');
+const { ServerErrorHandle, RequestLog } = require('./middleware');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(RequestLog);
 // register route
 app.use('/api/v1', require('./routes'));
+app.use(ServerErrorHandle);
 
 async function startApp() {
   const mongoseInstance = await mongoose
