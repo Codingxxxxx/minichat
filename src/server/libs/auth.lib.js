@@ -64,11 +64,12 @@ function signJWT(payload) {
 /**
  * Get payload from jwt token
  * @param {string} token 
+ * @param {boolean} ignoreExpiration
  * @returns {Promise<string>}
  */
-function decodeJWT(token) {
+function decodeJWT(token, ignoreExpiration=false) {
   return new Promise((resolve, reject) => {
-    verify(token, AppConfig.JWT_SECRET, (error, payload) => {
+    verify(token, AppConfig.JWT_SECRET, { ignoreExpiration: ignoreExpiration }, (error, payload) => {
       if (error) return reject(error);
       resolve(payload);
     })

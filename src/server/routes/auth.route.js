@@ -152,4 +152,56 @@ router.post('/logout', async (req, res, next) => {
   }
 })
 
+router.post('/revoke', async (req, res, next) => {
+  try {
+    const isValid = req.body.accessToken && req.body.refreshToken;
+    if (!isValid) return res.sendStatus(400);
+
+    const { accessToken, refreshToken } = req.body;
+
+    const payloadRefreshToken = await Auth.decodeRefreshToken(refreshToken).catch(() => {}); // ignore error
+
+    // if payloadRefreshToken is empty, it means the refresh token is already expired
+    if (!payloadRefreshToken) return res.sendStatus(400);
+
+    const payloadAccessToken = await Auth.decodeJWT(accessToken, true).catch(() => {}); // also ignore error
+
+    // invalid access token
+    if (!payloadAccessToken) return res.sendStatus(400);
+    
+    await redisClient.select(Redis.Database.JWT_CACHE);
+    
+    // check if access token and refresh token are in black list
+    const isTokenInBlackList = await redisClient.exists(`jwt-refresh-${refreshToken}`) || await redisClient.exists(`jwt-access-${refreshToken}`);
+    if (isTokenInBlackList) return res.sendStatus(400);
+    
+    // set refresh token to blacklist 
+    let expirationTime = moment.unix(payloadRefreshToken.exp);
+    let expiresIn = expirationTime.diff(moment(), 'seconds');
+    // lower than 1 mean it is expired
+    if (expiresIn > 0) await redisClient.setEx(`jwt-refresh-${refreshToken}`, expiresIn, '');
+
+    // set access token to blacklist 
+    expirationTime = moment.unix(payloadAccessToken.exp);
+    expiresIn = expirationTime.diff(moment(), 'seconds');
+    // lower than 1 mean it is expired
+    if (expiresIn > 0) await redisClient.setEx(`jwt-access-${accessToken}`, expiresIn, '')
+    
+    // issue new tokens
+    const [newAccessToken, newRefreshToken] = await Promise.all([
+      Auth.signJWT({ username: payloadAccessToken.username }),
+      Auth.signRefreshToken()
+    ])
+
+    res.status(200).json({
+      data: {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken
+      }
+    })
+  } catch (error) {
+    next(error);
+  }
+})
+
 module.exports = router;
