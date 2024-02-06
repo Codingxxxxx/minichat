@@ -35,7 +35,7 @@ router.post('/signin', async (req, res, next) => {
       userAgent: req.get('User-Agent')
     })
 
-    const accessToken = await Auth.signJWT({ username: user.username });
+    const accessToken = await Auth.signJWT({ username: user.username, userId: user._id });
     const refreshToken = await Auth.signRefreshToken();
 
     res.status(200).json({
@@ -189,7 +189,7 @@ router.post('/revoke', async (req, res, next) => {
     
     // issue new tokens
     const [newAccessToken, newRefreshToken] = await Promise.all([
-      Auth.signJWT({ username: payloadAccessToken.username }),
+      Auth.signJWT({ username: payloadAccessToken.username, userId: payloadAccessToken.userId }),
       Auth.signRefreshToken()
     ])
 
