@@ -46,12 +46,13 @@ function createRandomToken() {
 /**
  * Encode payload to jwt format
  * @param {Object} payload
+ * @param {string} expiresIn
  * @returns {Promise<string>}
  */
-function signJWT(payload) {
+function signJWT(payload, expiresIn='15m') {
   return new Promise((resolve, reject) => {
     sign(payload, AppConfig.JWT_SECRET, {
-      expiresIn: '15m',
+      expiresIn,
       subject: payload.username,
       issuer: 'www.easychat.com'
     }, (err, encodedString) => {

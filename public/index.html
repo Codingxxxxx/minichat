@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  hello
+  <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const query = new URLSearchParams(window.location.search);
+        const token = query.get('token');
+        
+        const socket = io('/chat', {
+          auth: {
+            token
+          }
+        });
+        
+        socket.on('connect', () => {
+          console.log('conencted');
+        })
+
+        socket.on('FRIEND_REQUEST', (username) => {
+          console.log('hello')
+        })
+
+        socket.emit('FRIEND_REQUEST', { to: '65c3e6348f9e7fca43c9f0fc' })
+    </script>
+</body>
+</html>
