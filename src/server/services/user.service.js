@@ -138,6 +138,25 @@ function updateAvatar(userId, { fileUrl, filename, size, mimetype }) {
   }).lean();
 }
 
+/**
+ * 
+ * @param {string} userId 
+ * @param {Object} friendRequest
+ * @param {string} friendRequest.from
+ * @returns {Promise<any>}
+ */
+function addFriendRequest(userId, { from }) {
+  return UserModel
+    .findByIdAndUpdate(userId, {
+      $push: {
+        friendRequests: {
+          from
+        }
+      }
+    })
+    .lean();
+}
+
 module.exports = {
   create,
   getUserByUsername,
@@ -147,5 +166,6 @@ module.exports = {
   removeVerificationToken,
   addLoginHistory,
   getUserById,
-  updateAvatar
+  updateAvatar,
+  addFriendRequest
 }

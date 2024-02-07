@@ -21,9 +21,16 @@ const MessageType = {
   FILE: 'FILE'
 }
 
+const FriendRequestStatus = {
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  PENDING: 'PENDING'
+}
+
 module.exports = {
   RegistrationMethod,
   UserStatus,
   MongoCollection,
-  MessageType
+  MessageType,
+  FriendRequestStatus
 }

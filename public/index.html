@@ -22,11 +22,13 @@
           console.log('conencted');
         })
 
-        socket.on('FRIEND_REQUEST', (username) => {
-          console.log('hello')
+        socket.on('ACCEPTED', (data) => {
+          console.log(data);
         })
 
-        socket.emit('FRIEND_REQUEST', { to: '65c3e6348f9e7fca43c9f0fc' })
+        socket.on('FRIEND_REQUEST', (payload) => {
+          console.log('FRIEND_REQUEST', payload);
+        })
     </script>
 </body>
 </html>

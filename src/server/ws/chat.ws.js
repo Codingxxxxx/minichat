@@ -24,8 +24,13 @@ async function initChat(socket) {
 async function onFriendRequest(from, payload) {
   try {
     const { userId } = from.request.user;
-    const user = await UserService.getUserById(userId);
-    findAllSockets(payload.to).forEach(s => s.emit(ChatSeverEvent.FRIEND_REQUEST, { username: user.username }))
+
+    const [user] = await Promise.all([
+      UserService.getUserById(userId),
+      UserService.addFriendRequest(payload.to, { from: userId })
+    ]);
+
+    findAllSockets(payload.to).forEach(s => s.emit(ChatSeverEvent.FRIEND_REQUEST, { username: user.username }));
   } catch (error) {
     Logger.error('event ' + ChatSeverEvent.FRIEND_REQUEST, error);
   }

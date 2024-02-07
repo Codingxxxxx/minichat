@@ -22,13 +22,13 @@ async function initWS(io, app) {
 async function onConnection(socket) {
   const userId = socket.request.user.userId;
 
-  storeSocket(socket, userId);
-  
-  console.log(Object.fromEntries(getSockets().entries()))
+  storeSocket(userId, socket);
 
   socket.on('disconnecting', () => {
     removeSocket(socket, userId);
   });
+  
+  socket.emit('ACCEPTED', { data: socket.request.user });
 
   initChat(socket);
 }

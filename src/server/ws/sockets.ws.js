@@ -9,6 +9,7 @@ const sockets = new Map();
 function storeSocket(userId, socket) {
   const s = sockets.get(userId) || [];
   s.push(socket);
+  sockets.set(userId, s);
 }
 
 /**
