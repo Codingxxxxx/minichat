@@ -15,7 +15,7 @@ function byteToMb(byte) {
 /**
  * Rename file in tmp dir
  * @param {import('express-fileupload').UploadedFile} file 
- * @returns {Promise<{ originalFileName: string, randomName: string }>}
+ * @returns {Promise<{ originalFileName: string, randomName: string, size: string, mimetype: string }>}
  */
 async function renameTmpFile(file) {
   const originalFileName = file.name;
@@ -28,7 +28,9 @@ async function renameTmpFile(file) {
       if (error) return reject(error);
       resolve({
         originalFileName,
-        randomName
+        randomName,
+        size: file.size,
+        mimetype: file.mimetype
       });
     })
   })

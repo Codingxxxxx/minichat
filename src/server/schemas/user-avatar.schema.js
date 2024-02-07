@@ -4,26 +4,21 @@ module.exports = {
     avatar: {
       type: 'object',
       properties: {
+        originalFileName: {
+          type: 'string'
+        },
+        randomName: {
+          type: 'string'
+        },
         size: {
-          type: 'number',
-          maximum: 2 // 3mb
+          type: 'number'
         },
         mimetype: {
-          type: 'string',
-          enum: [
-            'image/png',
-            'image/jpg',
-            'image/jpeg'
-          ]
+          type: 'string'
         }
       },
-      required: [
-        'size',
-        'mimetype'
-      ]
+      required: ['originalFileName', 'randomName', 'size', 'mimetype']
     }
   },
-  required: [
-    'avatar'
-  ]
+  required: ['avatar']
 }

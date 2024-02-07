@@ -5,6 +5,6 @@ module.exports = {
   Logger: require('./logger.lib'),
   HTML: require('./html.lib'),
   RedisClient: require('./redis.lib'),
-  S3Client: require('./s3.lib'),
+  S3: require('./s3.lib'),
   FileUtil: require('./file-util.lib')
 }

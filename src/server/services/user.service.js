@@ -111,10 +111,31 @@ function addLoginHistory(userId, { loginAt, ip, address, userAgent }) {
 /**
  * get a user by id
  * @param {string} id user id 
- * @returns 
+ * @returns {Promise<any>}
  */
 function getUserById(id) {
   return UserModel.findById(id).select('_id username displayName avatar email isVerified status createdAt').lean();
+}
+
+/**
+ * 
+ * @param {string} userId 
+ * @param {Object} avatar
+ * @param {string} avatar.fileUrl
+ * @param {string} avatar.filename
+ * @param {number} avatar.size
+ * @param {string} avatar.mimetype  
+ * @returns {Promise<any>}
+ */
+function updateAvatar(userId, { fileUrl, filename, size, mimetype }) {
+  return UserModel.findByIdAndUpdate(userId, {
+    avatar: {
+      fileUrl,
+      filename,
+      size,
+      mimetype
+    }
+  }).lean();
 }
 
 module.exports = {
@@ -125,5 +146,6 @@ module.exports = {
   setUserIsVerified,
   removeVerificationToken,
   addLoginHistory,
-  getUserById
+  getUserById,
+  updateAvatar
 }

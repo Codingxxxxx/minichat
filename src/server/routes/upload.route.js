@@ -13,7 +13,7 @@ router.post('/upload/avatar', async (req, res, next) => {
       }
     }
 
-    if (!Validator.validateUserAvatar(validationSchema)) return res.status(400).json({
+    if (!Validator.validateAvatarFile(validationSchema)) return res.status(400).json({
       code: API.ERROR_VALIDATION,
       data: {
         errors: Validator.validateUserAvatar.errors

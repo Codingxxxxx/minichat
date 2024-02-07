@@ -17,7 +17,9 @@ const {
   S3_REGION,
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
-  S3_BUCKET
+  S3_BUCKET,
+  S3_URL,
+  RANDOM_AVATAR_URL
 } = process.env;
 
 module.exports = {
@@ -39,5 +41,7 @@ module.exports = {
   S3_REGION,
   S3_ACCESS_KEY_ID,
   S3_SECRET_ACCESS_KEY,
-  S3_BUCKET
+  S3_BUCKET,
+  S3_URL,
+  RANDOM_AVATAR_URL
 }
