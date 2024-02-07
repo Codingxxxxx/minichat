@@ -6,10 +6,12 @@ require('ajv-formats').default(ajv);
 
 const {
   SignupSchema,
-  SigninSchema
+  SigninSchema,
+  UserAvatarSchema
 } = require('../schemas');
 
 module.exports = {
   validateSignUp: ajv.compile(SignupSchema),
-  validateSignIn: ajv.compile(SigninSchema)
+  validateSignIn: ajv.compile(SigninSchema),
+  validateUserAvatar: ajv.compile(UserAvatarSchema)
 }

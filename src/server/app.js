@@ -5,11 +5,17 @@ const { AppConfig } = require('./const');
 const { RedisClient, Logger } = require('./libs');
 const mongoose = require('mongoose');
 const { serverErrorHandle, requestLog } = require('./middleware');
+const expressFileUpload = require('express-fileupload');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(requestLog);
+app.use(expressFileUpload({
+  parseNested: true,
+  useTempFiles: true,
+  tempFileDir: 'tmp'
+}))
 // register route
 app.use('/api/v1', require('./routes'));
 app.use(serverErrorHandle);

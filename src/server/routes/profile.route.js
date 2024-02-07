@@ -21,4 +21,12 @@ router.get('/profile', checkAuth, async (req, res, next) => {
   }
 })
 
+router.post('/profile/avatar', checkAuth, async (req, res, next) => {
+  try {
+    
+  } catch (error) {
+    next(error);
+  }
+})
+
 module.exports = router;
