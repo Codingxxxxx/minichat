@@ -23,6 +23,9 @@ app.use(express.static(path.join(__dirname, '../../public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// swagger route
+app.use(require('./routes/swagger.route'));
+
 app.use(requestLog);
 app.use(expressFileUpload({
   parseNested: true,

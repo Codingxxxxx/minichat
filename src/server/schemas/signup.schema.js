@@ -7,6 +7,7 @@ module.exports = {
     },
     password: {
       type: 'string',
+      minLength: 6
     },
     email: {
       type: 'string',

@@ -1,0 +1,91 @@
+/signup:
+  post:
+    summary: create a user
+    tags: 
+      - Auth
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: 
+            type: 'object'
+            properties: 
+              username:
+                type: 'string'
+              password:
+                type: 'string'
+                minLength: 6
+              email:
+                type: 'string'
+                format: email
+            required:
+              - username
+              - password
+              - email
+          example:
+            username: john
+            password: '12345678'
+            email: john@dumpemail.com
+    responses:
+      201:
+        description: 'user has successfully created'
+      400:
+        description: 'Can be error validation or username is taken'
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: 'object'
+                  properties:
+                    code: 
+                      type: string
+                      example: ERROR_VALIDATION
+                - type: object
+                  properties:
+                    code: 
+                      type: string
+                      example: ERROR_USERNAME_TAKEN
+      $ref: './components.yaml#/responses/Error500'
+                    
+/signin:
+  post:
+    summary: Login to account
+    tags:
+      - Auth
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+            required:
+              - username
+              - password
+          example:
+            username: 'john'
+            password: '123456'
+    responses:
+      200:
+        description: Successfully login
+      400:
+        description: Can be login failed or username is taken
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  properties:
+                    code: 
+                      type: string
+                      example: ERROR_USER_INVALID
+                - type: object
+                  properties:
+                    code: 
+                      tyep: string
+                      example: ERROR_USERNAME_TAKEN
+      $ref: './components.yaml#/responses/Error500'
