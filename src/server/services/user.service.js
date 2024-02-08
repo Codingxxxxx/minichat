@@ -157,6 +157,46 @@ function addFriendRequest(userId, { from }) {
     .lean();
 }
 
+/**
+ * 
+ * @param {string} userId 
+ * @param {boolean} status 
+ * @returns 
+ */
+function updateOnlineStatus(userId, status) {
+  return UserModel  
+    .findByIdAndUpdate(userId, {
+      isOnline: status
+    })
+    .lean();
+}
+
+/**
+ * 
+ * @param {string} userId 
+ * @param {Object} friend
+ * @param {string} friend.friendId
+ * @returns 
+ */
+function addFriend(userId, { friendId }) {
+  return UserModel
+    .findByIdAndUpdate(userId, {
+      $push: {
+        friends: {
+          userId: friendId
+        }
+      }
+    })
+    .lean();
+}
+
+function getFriendByUserId(userId) {
+  return UserModel
+    .findById(userId)
+    .select('friends')
+    .lean();
+}
+
 module.exports = {
   create,
   getUserByUsername,
@@ -167,5 +207,8 @@ module.exports = {
   addLoginHistory,
   getUserById,
   updateAvatar,
-  addFriendRequest
+  addFriendRequest,
+  updateOnlineStatus,
+  addFriend,
+  getFriendByUserId
 }

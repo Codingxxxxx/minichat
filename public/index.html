@@ -22,6 +22,10 @@
           console.log('conencted');
         })
 
+        socket.on('JOIN_ROOM', (payload) => {
+          console.log('You joined', payload);
+        })
+
         socket.on('ACCEPTED', (data) => {
           console.log(data);
         })
