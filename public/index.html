@@ -22,8 +22,8 @@
           console.log('conencted');
         })
 
-        socket.on('JOIN_ROOM', (payload) => {
-          console.log('You joined', payload);
+        socket.on('USER_ONLINE_STATUS', (payload) => {
+          console.log('someone joined chat', payload);
         })
 
         socket.on('ACCEPTED', (data) => {

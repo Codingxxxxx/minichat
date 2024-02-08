@@ -1,7 +1,7 @@
 const { initChat } = require('./chat.ws');
 const { checkWSAuth } = require('../middleware');
 const { Logger } = require('../libs');
-const { storeSocket, removeSocket, getSockets } = require('./sockets.ws');
+const { storeSocket, removeSocket } = require('./sockets.ws');
 
 /**
  * Initialize websocket
@@ -24,12 +24,7 @@ async function initWS(io, app) {
  */
 async function onConnection(socket, io) {
   const userId = socket.request.user.userId;
-  storeSocket(userId, socket);
-
-  socket.on('disconnecting', () => {
-    removeSocket(socket, userId);
-  });
-  
+  storeSocket(userId, socket);  
   socket.emit('ACCEPTED', { data: socket.request.user });
 
   initChat(socket, io);

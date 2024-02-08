@@ -1,7 +1,8 @@
 const { Logger } = require('../libs');
 const { UserService } = require('../services');
-const { findAllSockets } = require('./sockets.ws');
+const { findAllSockets, removeSocket } = require('./sockets.ws');
 const { ChatSeverEvent } = require('../const').WSEvent;
+const { storeRoom, findRooms, removeRoom, removeAllRooms } = require('./rooms.ws');
 
 function createRoomId(id1, id2) {
   return `/chat/private/${[id1, id2].sort().join('-')}`;
@@ -18,16 +19,42 @@ function createFriendRequestRoomId(id1, id2) {
  */
 async function initChat(socket, io) {
   const userId = socket.request.user.userId;
+  await UserService.updateOnlineStatus(userId, true);
 
+  socket.on('disconnecting', () => {
+    onDisconnect(socket, userId);
+  });
+
+  // join private chat room
   socket.on(ChatSeverEvent.JOIN_ROOM, ({ otherUserId }) => {
-    const roomId = createRoomId(userId, otherUserId);
-    socket.join(roomId);
-    socket.emit(ChatSeverEvent.JOIN_ROOM, { roomId, otherUserId });
+    onJoinRoom(socket, { currentUserId: userId, otherUserId });
   })
-
+  
+  // friend request
   socket.on(ChatSeverEvent.FRIEND_REQUEST, (payload) => {
     onFriendRequest(socket, payload);
-  });
+  })
+}
+
+/**
+ * handle on socket disconnecting
+ * @param {import('socket.io').Socket} socket 
+ */
+async function onDisconnect(socket, userId) {
+  try { 
+    // remove socket 
+    removeSocket(userId, socket);
+
+    if (findAllSockets(userId).length === 0) {
+      await UserService.updateOnlineStatus(userId, false);
+      findRooms(userId).forEach(r => {
+        socket.to(r).emit(ChatSeverEvent.USER_ONLINE_STATUS, { userId, isOnline: false });
+      });
+      removeAllRooms(userId);
+    }
+  } catch (error) {
+    Logger.error('event ' + 'disconnecting', error);
+  }
 }
 
 /**
@@ -60,18 +87,17 @@ async function onFriendRequest(from, payload) {
 
 /**
  * 
- * @param {import('socket.io').Socket} from 
- * @param {Object} payload 
- * @param {boolean} payload.isOnline
+ * @param {import('socket.io').Socket} socket 
+ * @param {Object} payload
+ * @param {string} payload.otherUserId
+ * @param {string} payload.currentUserId 
  */
-async function onUserOnlineStatusChange(from, payload) {
-  try {
-    
-    const userId = from.request.user.userId;
-    await UserService.updateOnlineStatus(userId, payload.isOnline);
-  } catch (error) {
-    Logger.error('event ' + ChatSeverEvent.USER_ONLINE_STATUS)
-  }
+function onJoinRoom(socket, { otherUserId, currentUserId }) {
+  const roomId = createRoomId(currentUserId, otherUserId);
+  socket.join(roomId);
+  storeRoom(currentUserId, roomId);
+  // notify online status
+  socket.to(roomId).emit(ChatSeverEvent.USER_ONLINE_STATUS, { userId: currentUserId, isOnline: true });
 }
 
 module.exports = {
