@@ -9,7 +9,7 @@ const { Auth } = require('../libs');
 module.exports = async function(req, res, next) {
   try {
     // validate token
-    const accessToken = req.get('Authorization').split(' ')[1];
+    const accessToken = (req.get('Authorization') || '').split(' ')[1];
 
     if (!accessToken) return res.sendStatus(401);
     
