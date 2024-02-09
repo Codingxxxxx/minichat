@@ -2,3 +2,6 @@ responses:
   Error500:
     500: 
       description: Server Error
+  Error401:
+    401:
+      description: Unauthorized
