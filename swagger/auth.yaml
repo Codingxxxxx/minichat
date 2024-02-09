@@ -3,6 +3,7 @@
     summary: create a user
     tags: 
       - Auth
+    security: []
     requestBody:
       required: true
       content:
@@ -52,6 +53,7 @@
     summary: Login to account
     tags:
       - Auth
+    security: []
     requestBody:
       required: true
       content:
@@ -94,6 +96,7 @@
     summary: Logout
     tags: 
       - Auth
+    security: []
     requestBody:
       required: true
       content:
@@ -116,23 +119,8 @@
     summary: Renew access token
     tags:
       - Auth
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              accessToken:
-                type: string
-              refreshToken:
-                type: string
-            required:
-              - accessToken
-              - refreshToken
-          example:
-            accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJpYXQiOjE3MDcyMDcwMzQsImV4cCI6MTcwNzIwNzkzNCwiaXNzIjoid3d3LmVhc3ljaGF0LmNvbSIsInN1YiI6ImpvaG4ifQ.rTO82B2Pvb4GoD46EFZecwlQLJSLrC4KjlesucCvbhg
-            refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDcyMDcwMzQsImV4cCI6MTcwOTc5OTAzNH0.OmwUqAxd72FsTpB_h1aRJ7sfGF_Dht6xE3pjTKXQ4aE
+    security:
+      - bearerAuth: []
     responses:
       200:
         description: Successfully obtain new tokens
@@ -161,6 +149,8 @@
     summary: request chat token
     tags:
       - Auth
+    security:
+      - bearerAuth: []
     responses:
       200:
         description: successfully obtain access token for chat
