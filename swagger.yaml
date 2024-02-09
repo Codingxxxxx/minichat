@@ -9,9 +9,13 @@ info:
 servers:
   - url: http://localhost:3000/api/v1
     description: development
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  security:
+    - bearerAuth: []
 paths:
   $ref: './swagger/auth.yaml'
-securitySchemes:
-  bearerAuth:
-    type: http
-    scheme: bearer
