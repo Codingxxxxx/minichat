@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon -e js,yaml,json,.env --watch swagger --watch src --watch .env --watch package.json --watch swagger.yaml ./src/server/app.js",
+    "dev": "docker compose up -d && nodemon -e js,yaml,json,.env --watch swagger --watch src --watch .env --watch package.json --watch swagger.yaml ./src/server/app.js",
     "prepare": "husky"
   },
   "keywords": [],
