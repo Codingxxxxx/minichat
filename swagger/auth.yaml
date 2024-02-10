@@ -46,8 +46,7 @@
                     code: 
                       type: string
                       example: ERROR_USERNAME_TAKEN
-      $ref: './components.yaml#/responses/Error500'
-                    
+      $ref: './components.yaml#/responses/Error500'                
 /signin:
   post:
     summary: Login to account

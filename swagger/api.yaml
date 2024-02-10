@@ -1,0 +1,3 @@
+paths:
+  - swagger/auth.yaml
+  - swagger/user.yaml

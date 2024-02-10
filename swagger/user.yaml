@@ -1,0 +1,59 @@
+/profile:
+  get:
+    summary: Get a user
+    tags:
+      - User
+    security:
+      - bearerAuth: []
+    responses:
+      400:
+        description: User not found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code: 
+                  type: string
+                  example: ERROR_RESOURCE_NOTFOUND
+      200:
+        description: Successfully fetched a user
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    user:
+                      type: object
+                      properties:
+                        _id: 
+                          type: string
+                          example: 65c64951969f844b5e7ec6d0
+                        username:
+                          type: string
+                          example: user1
+                        displayName: 
+                          type: string
+                          example: Annonymous
+                        email:
+                          type: string
+                          format: email
+                          example: Annonymous
+                        isVerified:
+                          type: boolean
+                          example: false
+                        status:
+                          type: string
+                          example: ACTIVE
+                        createdAt:
+                          type: date
+                          example: '2024-02-09T15:48:33.455Z'
+                        avatar:
+                          type: object
+                          properties:
+                            fileUrl:
+                              type: string
+                              example: https://api.dicebear.com/7.x/bottts/svg?seed=user1
