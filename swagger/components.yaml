@@ -5,3 +5,6 @@ responses:
   Error401:
     401:
       description: Unauthorized
+  Error400:
+    400:
+      description: Validation Error
