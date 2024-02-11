@@ -1,0 +1,47 @@
+/upload/avatar:
+  post:
+    summary: Upload avatar file to server
+    tags:
+      - File Upload
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              avatar:
+                type: string
+                format: binary
+    responses:
+      200:
+        description: Successfully uplaoded file to server
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    file:
+                      type: object
+                      properties:
+                        originalFileName:
+                          type: string
+                          example: 360_F_28084010_bGRJetPfBwNcO3YuRC2C3Pz7qASocWQ4
+                        randomName:
+                          type: string
+                          example: 2e104361-45e1-4866-a7df-087a7925e432.jpg
+                        size:
+                          type: number
+                          example: 33745
+                        mimetype:
+                          type: string           
+                          example: image/jpeg
+      400:
+        description: File not found
+      500:
+        $ref: ./components.yaml#/responses/Error500/500

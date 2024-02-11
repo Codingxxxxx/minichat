@@ -1,3 +1,4 @@
 paths:
   - swagger/auth.yaml
   - swagger/profile.yaml
+  - swagger/upload.yaml
