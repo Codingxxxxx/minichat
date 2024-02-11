@@ -1,0 +1,176 @@
+/signup:
+  post:
+    summary: create a user
+    tags: 
+      - Auth
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: 
+            type: 'object'
+            properties: 
+              username:
+                type: 'string'
+              password:
+                type: 'string'
+                minLength: 6
+              email:
+                type: 'string'
+                format: email
+            required:
+              - username
+              - password
+              - email
+          example:
+            username: john
+            password: '12345678'
+            email: john@dumpemail.com
+    responses:
+      201:
+        description: 'user has successfully created'
+      400:
+        description: 'Can be error validation or username is taken'
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: 'object'
+                  properties:
+                    code: 
+                      type: string
+                      example: ERROR_VALIDATION
+                - type: object
+                  properties:
+                    code: 
+                      type: string
+                      example: ERROR_USERNAME_TAKEN
+      $ref: './components.yaml#/responses/Error500'                
+/signin:
+  post:
+    summary: Login to account
+    tags:
+      - Auth
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+            required:
+              - username
+              - password
+          example:
+            username: 'john'
+            password: '123456'
+    responses:
+      200:
+        description: Successfully login
+      400:
+        description: Can be login failed or username is taken
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  properties:
+                    code: 
+                      type: string
+                      example: ERROR_USER_INVALID
+                - type: object
+                  properties:
+                    code: 
+                      tyep: string
+                      example: ERROR_USERNAME_TAKEN
+      $ref: './components.yaml#/responses/Error500'
+/logout:
+  post:
+    summary: Logout
+    tags: 
+      - Auth
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              accessToken:
+                type: string
+              refreshToken:
+                type: string
+          example:
+            accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJpYXQiOjE3MDcyMDcwMzQsImV4cCI6MTcwNzIwNzkzNCwiaXNzIjoid3d3LmVhc3ljaGF0LmNvbSIsInN1YiI6ImpvaG4ifQ.rTO82B2Pvb4GoD46EFZecwlQLJSLrC4KjlesucCvbhg
+            refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDcyMDcwMzQsImV4cCI6MTcwOTc5OTAzNH0.OmwUqAxd72FsTpB_h1aRJ7sfGF_Dht6xE3pjTKXQ4aE
+    responses:
+      200:
+        description: User logged out
+/revoke:
+  post:
+    summary: Renew access token
+    tags:
+      - Auth
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Successfully obtain new tokens
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    auth:
+                      type: object
+                      properties:
+                        accessToken:
+                          type: string
+                          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJpYXQiOjE3MDcyMDcwMzQsImV4cCI6MTcwNzIwNzkzNCwiaXNzIjoid3d3LmVhc3ljaGF0LmNvbSIsInN1YiI6ImpvaG4ifQ.rTO82B2Pvb4GoD46EFZecwlQLJSLrC4KjlesucCvbhg
+                        refreshToken:
+                          type: string
+                          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDcyMDcwMzQsImV4cCI6MTcwOTc5OTAzNH0.OmwUqAxd72FsTpB_h1aRJ7sfGF_Dht6xE3pjTKXQ4aE
+      400:
+        description: refresh token is already expired, need to re-login
+      $ref: ./components.yaml#/responses/Error500
+/chat-token:
+  post:
+    summary: request chat token
+    tags:
+      - Auth
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: successfully obtain access token for chat
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    chat:
+                      type: object
+                      properties:
+                        accessToken:
+                          type: string
+                          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJpYXQiOjE3MDcyMDcwMzQsImV4cCI6MTcwNzIwNzkzNCwiaXNzIjoid3d3LmVhc3ljaGF0LmNvbSIsInN1YiI6ImpvaG4ifQ.rTO82B2Pvb4GoD46EFZecwlQLJSLrC4KjlesucCvbhg
+      401:
+        $ref: ./components.yaml#/responses/Error401/401
+      500:
+        $ref: ./components.yaml#/responses/Error500/500
+
+
+

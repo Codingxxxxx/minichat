@@ -1,5 +1,5 @@
-const { Schema, model } = require('mongoose');
-const { RegistrationMethod, UserStatus, MongoCollection } = require('../const').DB;
+const { Schema, model, SchemaTypes } = require('mongoose');
+const { RegistrationMethod, UserStatus, MongoCollection, FriendRequestStatus } = require('../const').DB;
 
 const schema = new Schema({
   username: {
@@ -37,6 +37,36 @@ const schema = new Schema({
       type: String
     }
   },
+  friendRequests: [{
+    from: {
+      type: SchemaTypes.ObjectId,
+      ref: MongoCollection.USER,
+      required: true
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: Object.values(FriendRequestStatus),
+      default: FriendRequestStatus.PENDING
+    },
+    createdAt: {
+      type: Date,
+      required: true,
+      default: Date.now
+    }
+  }],
+  friends: [{
+    userId: {
+      type: SchemaTypes.ObjectId,
+      ref: MongoCollection.USER,
+      required: true
+    },
+    joinedAt: {
+      type: Date,
+      required: true,
+      default: Date.now
+    }
+  }],
   registrationMethod: {
     type: String,
     enum: Object.values(RegistrationMethod),
@@ -52,6 +82,11 @@ const schema = new Schema({
     type: String,
     enum: Object.values(UserStatus),
     default: UserStatus.ACTIVE
+  },
+  isOnline: {
+    type: Boolean,
+    required: true,
+    default: false
   },
   loginHistory: [{
     loginAt: {

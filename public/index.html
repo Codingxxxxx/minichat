@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  hello
+  <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const query = new URLSearchParams(window.location.search);
+        const token = query.get('token');
+        
+        const socket = io('/chat', {
+          auth: {
+            token
+          }
+        });
+        
+        socket.on('connect', () => {
+          console.log('conencted');
+        })
+
+        socket.on('USER_ONLINE_STATUS', (payload) => {
+          console.log('someone joined chat', payload);
+        })
+
+        socket.on('ACCEPTED', (data) => {
+          console.log(data);
+        })
+
+        socket.on('FRIEND_REQUEST', (payload) => {
+          console.log('FRIEND_REQUEST', payload);
+        })
+    </script>
+</body>
+</html>

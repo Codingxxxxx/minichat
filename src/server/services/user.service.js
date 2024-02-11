@@ -108,6 +108,95 @@ function addLoginHistory(userId, { loginAt, ip, address, userAgent }) {
   })
 }
 
+/**
+ * get a user by id
+ * @param {string} id user id 
+ * @returns {Promise<any>}
+ */
+function getUserById(id) {
+  return UserModel.findById(id).select('_id username displayName avatar email isVerified status createdAt').lean();
+}
+
+/**
+ * 
+ * @param {string} userId 
+ * @param {Object} avatar
+ * @param {string} avatar.fileUrl
+ * @param {string} avatar.filename
+ * @param {number} avatar.size
+ * @param {string} avatar.mimetype  
+ * @returns {Promise<any>}
+ */
+function updateAvatar(userId, { fileUrl, filename, size, mimetype }) {
+  return UserModel.findByIdAndUpdate(userId, {
+    avatar: {
+      fileUrl,
+      filename,
+      size,
+      mimetype
+    }
+  }).lean();
+}
+
+/**
+ * 
+ * @param {string} userId 
+ * @param {Object} friendRequest
+ * @param {string} friendRequest.from
+ * @returns {Promise<any>}
+ */
+function addFriendRequest(userId, { from }) {
+  return UserModel
+    .findByIdAndUpdate(userId, {
+      $push: {
+        friendRequests: {
+          from
+        }
+      }
+    })
+    .lean();
+}
+
+/**
+ * 
+ * @param {string} userId 
+ * @param {boolean} status 
+ * @returns 
+ */
+function updateOnlineStatus(userId, status) {
+  return UserModel  
+    .findByIdAndUpdate(userId, {
+      isOnline: status
+    })
+    .lean();
+}
+
+/**
+ * 
+ * @param {string} userId 
+ * @param {Object} friend
+ * @param {string} friend.friendId
+ * @returns 
+ */
+function addFriend(userId, { friendId }) {
+  return UserModel
+    .findByIdAndUpdate(userId, {
+      $push: {
+        friends: {
+          userId: friendId
+        }
+      }
+    })
+    .lean();
+}
+
+function getFriendByUserId(userId) {
+  return UserModel
+    .findById(userId)
+    .select('friends')
+    .lean();
+}
+
 module.exports = {
   create,
   getUserByUsername,
@@ -115,5 +204,11 @@ module.exports = {
   createUserVerificationToken,
   setUserIsVerified,
   removeVerificationToken,
-  addLoginHistory
+  addLoginHistory,
+  getUserById,
+  updateAvatar,
+  addFriendRequest,
+  updateOnlineStatus,
+  addFriend,
+  getFriendByUserId
 }

@@ -1,0 +1,115 @@
+/profile:
+  get:
+    summary: Get a user
+    tags:
+      - Profile
+    security:
+      - bearerAuth: []
+    responses:
+      400:
+        description: User not found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code: 
+                  type: string
+                  example: ERROR_RESOURCE_NOTFOUND
+      200:
+        description: Successfully fetched a user
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    user:
+                      type: object
+                      properties:
+                        _id: 
+                          type: string
+                          example: 65c64951969f844b5e7ec6d0
+                        username:
+                          type: string
+                          example: user1
+                        displayName: 
+                          type: string
+                          example: Annonymous
+                        email:
+                          type: string
+                          format: email
+                          example: Annonymous
+                        isVerified:
+                          type: boolean
+                          example: false
+                        status:
+                          type: string
+                          example: ACTIVE
+                        createdAt:
+                          type: date
+                          example: '2024-02-09T15:48:33.455Z'
+                        avatar:
+                          type: object
+                          properties:
+                            fileUrl:
+                              type: string
+                              example: https://api.dicebear.com/7.x/bottts/svg?seed=user1
+/profile/avatar:
+  put:
+    summary: Update user avatar
+    tags:
+      - Profile
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              avatar:
+                type: object
+                properties:
+                  originalFileName:
+                    type: string
+                  randomName:
+                    type: string
+                  size:
+                    type: number
+                  mimetype:
+                    type: string
+                required:
+                  - originalFileName
+                  - randomName
+                  - size
+                  - mimetype
+            required:
+              - avatar
+          example:
+            avatar:
+              originalFileName: 360_F_28084010_bGRJetPfBwNcO3YuRC2C3Pz7qASocWQ4.jpg
+              randomName: 2e104361-45e1-4866-a7df-087a7925e432.jpg
+              size: 33745
+              mimetype: image/jpeg
+    responses:
+      200:
+        description: Successfully updated user avatar
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    avatarUrl:
+                      type: string
+                      example: https://minichat69.s3.ap-southeast-1.amazonaws.com/user/avatar/65c64951969f844b5e7ec6d0/2e104361-45e1-4866-a7df-087a7925e432.jpg
+      400:
+        $ref: ./components.yaml#/responses/Error400/400
+      500:
+        $ref: ./components.yaml#/responses/Error500/500

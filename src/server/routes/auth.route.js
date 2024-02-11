@@ -4,6 +4,7 @@ const { redisClient } = require('../libs').RedisClient;
 const { API, AppConfig, Redis } = require('./../const');
 const { UserService } = require('../services');
 const moment = require('moment');
+const { checkAuth } = require('../middleware');
 
 router.post('/signin', async (req, res, next) => {
   try {
@@ -35,7 +36,7 @@ router.post('/signin', async (req, res, next) => {
       userAgent: req.get('User-Agent')
     })
 
-    const accessToken = await Auth.signJWT({ username: user.username });
+    const accessToken = await Auth.signJWT({ username: user.username, userId: user._id });
     const refreshToken = await Auth.signRefreshToken();
 
     res.status(200).json({
@@ -189,14 +190,35 @@ router.post('/revoke', async (req, res, next) => {
     
     // issue new tokens
     const [newAccessToken, newRefreshToken] = await Promise.all([
-      Auth.signJWT({ username: payloadAccessToken.username }),
+      Auth.signJWT({ username: payloadAccessToken.username, userId: payloadAccessToken.userId }),
       Auth.signRefreshToken()
     ])
 
     res.status(200).json({
       data: {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken
+        auth: {
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken
+        }
+      }
+    })
+  } catch (error) {
+    next(error);
+  }
+})
+
+router.post('/chat-token', checkAuth, async (req, res, next) => {
+  try {
+    const accessToken = await Auth.signJWT({
+      userId: res.locals.userId,
+      username: res.locals.username
+    }, AppConfig.NODE_ENV === 'development' ? '100 days' : '10m');
+
+    res.status(200).json({
+      data: {
+        chat: {
+          accessToken
+        }
       }
     })
   } catch (error) {
