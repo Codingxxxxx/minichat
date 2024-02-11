@@ -23,9 +23,7 @@ Promise.all(
 
         swaggerConfig.paths = allApiPaths;
 
-        router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerConfig, {
-            explorer: true
-        }));
+        router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerConfig));
     })
 })
 
