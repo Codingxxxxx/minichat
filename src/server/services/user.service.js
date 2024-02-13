@@ -158,6 +158,25 @@ function addFriendRequest(userId, { from }) {
 }
 
 /**
+ * Add pending friend request
+ * @param {string} userId 
+ * @param {Object} pendingFriendRequest
+ * @param {string} pendingFriendRequest.to 
+ * @returns {Promise}
+ */
+function addPendingFriendRequest(userId, { to }) {
+  return UserModel
+    .findByIdAndUpdate(userId, {
+      $push: {
+        pendingFriendRequests: {
+          to
+        }
+      }
+    })
+    .lean();
+}
+
+/**
  * 
  * @param {string} userId 
  * @param {boolean} status 
@@ -190,10 +209,24 @@ function addFriend(userId, { friendId }) {
     .lean();
 }
 
-function getFriendByUserId(userId) {
+/**
+ * 
+ * @param {string} userId 
+ * @param {string} friendId 
+ * @returns {Promise}
+ */
+function getPendingFriendRequest(userId, friendId) {
   return UserModel
-    .findById(userId)
-    .select('friends')
+    .findOne(
+      {
+        _id: userId,
+        'pendingFriendRequests.to': friendId
+      },
+      {
+        _id: 0,
+        'pendingFriendRequests.$': 1
+      }
+    )
     .lean();
 }
 
@@ -210,5 +243,6 @@ module.exports = {
   addFriendRequest,
   updateOnlineStatus,
   addFriend,
-  getFriendByUserId
+  addPendingFriendRequest,
+  getPendingFriendRequest
 }

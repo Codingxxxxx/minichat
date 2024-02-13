@@ -55,6 +55,18 @@ const schema = new Schema({
       default: Date.now
     }
   }],
+  pendingFriendRequests: [{
+    to: {
+      type: SchemaTypes.ObjectId,
+      ref: MongoCollection.USER,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      required: true,
+      default: Date.now
+    }
+  }],
   friends: [{
     userId: {
       type: SchemaTypes.ObjectId,

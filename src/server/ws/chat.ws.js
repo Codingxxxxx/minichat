@@ -4,10 +4,22 @@ const { findAllSockets, removeSocket } = require('./sockets.ws');
 const { ChatSeverEvent } = require('../const').WSEvent;
 const { storeRoom, findRooms, removeRoom, removeAllRooms } = require('./rooms.ws');
 
+/**
+ * Create room id
+ * @param {string} id1 
+ * @param {string} id2 
+ * @returns {string}
+ */
 function createRoomId(id1, id2) {
   return `/chat/private/${[id1, id2].sort().join('-')}`;
 }
 
+/**
+ * Create friend request room
+ * @param {string} id1 
+ * @param {string} id2 
+ * @returns {string}
+ */
 function createFriendRequestRoomId(id1, id2) {
   return `/chat/friend-request/${[id1, id2].sort().join('-')}`;
 }
@@ -66,7 +78,15 @@ async function onDisconnect(socket, userId) {
  */
 async function onFriendRequest(from, payload) {
   try {
-    const { userId } = from.request.user;
+    const { userId, username } = from.request.user;
+
+    // check if friend request is already sent, user can't send requst multiple times 
+    // if they are already send once
+    // the users can submit friend requests again when other users approved or rejected the requests.
+    const user = await UserService.getPendingFriendRequest(userId, payload.to);
+    
+    if (user && user.pendingFriendRequests.length > 0) return Logger.warn(`Event: ${ChatSeverEvent.FRIEND_REQUEST} Can not sent friend request twice.`);
+
     // create room id
     const friendRequestRoomId = createFriendRequestRoomId(userId, payload.to);
 
@@ -74,12 +94,13 @@ async function onFriendRequest(from, payload) {
     // reciever 
     findAllSockets(payload.to).forEach(s => s.join(friendRequestRoomId));
 
-    const [user] = await Promise.all([
-      UserService.getUserById(userId),
-      UserService.addFriendRequest(payload.to, { from: userId })
+    await Promise.all([
+      UserService.addFriendRequest(payload.to, { from: userId }),
+      UserService.addPendingFriendRequest(userId, { to: payload.to })
     ])
     
-    from.to(friendRequestRoomId).emit(ChatSeverEvent.FRIEND_REQUEST, { username: user.username });
+    // broadcast to all joined privat chat rooms
+    from.to(friendRequestRoomId).emit(ChatSeverEvent.FRIEND_REQUEST, { username });
   } catch (error) {
     Logger.error('event ' + ChatSeverEvent.FRIEND_REQUEST, error);
   }
