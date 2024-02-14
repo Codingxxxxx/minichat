@@ -33,6 +33,10 @@
         socket.on('FRIEND_REQUEST', (payload) => {
           console.log('FRIEND_REQUEST', payload);
         })
+
+        socket.on('FRIEND_REQUEST_ACTION', (payload) => {
+          console.log('FRIEND_REQUEST_ACTION', payload);
+        })
     </script>
 </body>
 </html>

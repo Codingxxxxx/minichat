@@ -3,6 +3,7 @@ const { UserService } = require('../services');
 const { findAllSockets, removeSocket } = require('./sockets.ws');
 const { ChatSeverEvent } = require('../const').WSEvent;
 const { storeRoom, findRooms, removeRoom, removeAllRooms } = require('./rooms.ws');
+const { FriendRequestStatus } = require('../const').DB;
 
 /**
  * Create room id
@@ -45,6 +46,18 @@ async function initChat(socket, io) {
   // friend request
   socket.on(ChatSeverEvent.FRIEND_REQUEST, (payload) => {
     onFriendRequest(socket, payload);
+  })
+
+  // friend request actions, rejected or approved
+  socket.on(ChatSeverEvent.FRIEND_REQUEST_ACTION, (payload) => {
+    onFriendRequestAction(
+      socket, 
+      { 
+        currentUserId: userId, 
+        otherUserId: payload.otherUserId,
+        accepted: payload.accepted
+      }
+    )
   })
 }
 
@@ -119,6 +132,47 @@ function onJoinRoom(socket, { otherUserId, currentUserId }) {
   storeRoom(currentUserId, roomId);
   // notify online status
   socket.to(roomId).emit(ChatSeverEvent.USER_ONLINE_STATUS, { userId: currentUserId, isOnline: true });
+}
+
+/**
+ * 
+ * @param {import('socket.io').Socket} socket 
+ * @param {Object} friendRequestAction
+ * @param {string} friendRequestAction.otherUserId
+ * @param {string} friendRequestAction.currentUserId
+ * @param {boolean} friendRequestAction.accepted
+ */
+async function onFriendRequestAction(socket, { otherUserId, currentUserId, accepted }) {
+  try {
+    // check if has friend request
+    if (!await UserService.getFriendRequestByStatus(currentUserId, { from: otherUserId, status: FriendRequestStatus.PENDING })) return;
+    
+    const friendRequestRoomId = createFriendRequestRoomId(currentUserId, otherUserId);
+    const privateRoomId = createRoomId(currentUserId, otherUserId);
+
+    if (accepted) {
+      await Promise.all([
+        UserService.addFriend(currentUserId, { friendId: otherUserId }),
+        UserService.addFriend(otherUserId, { friendId: currentUserId })
+      ])
+
+      socket.join(privateRoomId, friendRequestRoomId);
+      findAllSockets(otherUserId).forEach(s => s.join(privateRoomId, friendRequestRoomId));
+    } else {
+      socket.join(friendRequestRoomId);
+      findAllSockets(otherUserId).forEach(s => s.join(friendRequestRoomId));
+    }
+
+    await Promise.all([
+      UserService.updateFriendRequestStatus(currentUserId, { friendId: otherUserId, status: accepted ? FriendRequestStatus.APPROVED : FriendRequestStatus.REJECTED }),
+      UserService.updatePendingFriendRequestStatus(otherUserId, { to: currentUserId, status: accepted ? FriendRequestStatus.APPROVED : FriendRequestStatus.REJECTED })
+    ])
+
+    socket.to(friendRequestRoomId).emit(ChatSeverEvent.FRIEND_REQUEST_ACTION, { userId: currentUserId });
+  } catch (error) {
+    console.error(error);
+    Logger.error('event ' + ChatSeverEvent.FRIEND_REQUEST_ACTION, error);
+  }
 }
 
 module.exports = {

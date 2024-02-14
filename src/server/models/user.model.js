@@ -61,6 +61,11 @@ const schema = new Schema({
       ref: MongoCollection.USER,
       required: true
     },
+    status: {
+      type: String,
+      enum: Object.values(FriendRequestStatus),
+      default: FriendRequestStatus.PENDING
+    },
     createdAt: {
       type: Date,
       required: true,

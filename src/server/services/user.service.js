@@ -179,6 +179,61 @@ function addPendingFriendRequest(userId, { to }) {
 /**
  * 
  * @param {string} userId 
+ * @param {Object} friendRequest
+ * @param {string} friendRequest.from 
+ * @param {string} friendRequest.status
+ */
+function getFriendRequestByStatus(userId, { from, status }) {
+  return UserModel
+    .findOne(
+      {
+        _id: userId,
+        'friendRequests.from': from,
+        'friendRequests.status': status
+      },
+      {
+        _id: 1,
+        'friendRequests.$': 1
+      }
+    )
+    .lean();
+}
+
+/**
+ * 
+ * @param {string} userId 
+ * @param {Object} pendingFriendRequest
+ * @param {string} pendingFriendRequest.to
+ * @param {string} pendingFriendRequest.status 
+ * @returns {Promise}
+ */
+function updatePendingFriendRequestStatus(userId, { to, status }) {
+  return UserModel
+    .findOneAndUpdate(
+      {
+        _id: userId,
+        'pendingFriendRequests.to': to
+      },
+      {
+        $set: {
+          'pendingFriendRequests.$.status': status
+        }
+      },
+      {
+        projection: {
+          _id: 1,
+          username: 1,
+          email: 1,
+          'pendingFriendRequests.$': 1
+        }
+      }
+    )
+    .lean();
+}
+
+/**
+ * 
+ * @param {string} userId 
  * @param {boolean} status 
  * @returns 
  */
@@ -223,8 +278,40 @@ function getPendingFriendRequest(userId, friendId) {
         'pendingFriendRequests.to': friendId
       },
       {
-        _id: 0,
+        _id: 1,
         'pendingFriendRequests.$': 1
+      }
+    )
+    .lean();
+}
+
+/**
+ * 
+ * @param {string} userId 
+ * @param {Object} friendRequest
+ * @param {string} friendRequest.friendId
+ * @param {string} friendRequest.status 
+ * @returns {Promise}
+ */
+function updateFriendRequestStatus(userId, { friendId, status }) {
+  return UserModel
+    .findOneAndUpdate(
+      {
+        _id: userId,
+        'friendRequests.from': friendId
+      },
+      {
+        $set: {
+          'friendRequests.$.status': status
+        }
+      },
+      {
+        projection: {
+          _id: 1,
+          username: 1,
+          email: 1,
+          'friendRequests.$': 1
+        }
       }
     )
     .lean();
@@ -244,5 +331,8 @@ module.exports = {
   updateOnlineStatus,
   addFriend,
   addPendingFriendRequest,
-  getPendingFriendRequest
+  getPendingFriendRequest,
+  updatePendingFriendRequestStatus,
+  updateFriendRequestStatus,
+  getFriendRequestByStatus
 }
