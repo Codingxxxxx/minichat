@@ -288,6 +288,30 @@ function getPendingFriendRequest(userId, friendId) {
 /**
  * 
  * @param {string} userId 
+ * @param {Object} pendingFriendRequest
+ * @param {string} pendingFriendRequest.friendId
+ * @param {string} pendingFriendRequest.status
+ * @returns {Prommise<Object>}
+ */
+function getPendingFriendRequestByStatus(userId, { friendId, status}) {
+  return UserModel
+    .findOne(
+      {
+        _id: userId,
+        'pendingFriendRequests.to': friendId,
+        'pendingFriendRequests.status': status
+      },
+      {
+        _id: 1,
+        'pendingFriendRequests.$': 1
+      }
+    )
+    .lean();
+}
+
+/**
+ * 
+ * @param {string} userId 
  * @param {Object} friendRequest
  * @param {string} friendRequest.friendId
  * @param {string} friendRequest.status 
@@ -332,6 +356,7 @@ module.exports = {
   addFriend,
   addPendingFriendRequest,
   getPendingFriendRequest,
+  getPendingFriendRequestByStatus,
   updatePendingFriendRequestStatus,
   updateFriendRequestStatus,
   getFriendRequestByStatus

@@ -96,7 +96,7 @@ async function onFriendRequest(from, payload) {
     // check if friend request is already sent, user can't send requst multiple times 
     // if they are already send once
     // the users can submit friend requests again when other users approved or rejected the requests.
-    const user = await UserService.getPendingFriendRequest(userId, payload.to);
+    const user = await UserService.getPendingFriendRequestByStatus(userId, { friendId: payload.to, status: FriendRequestStatus.PENDING});
     
     if (user && user.pendingFriendRequests.length > 0) return Logger.warn(`Event: ${ChatSeverEvent.FRIEND_REQUEST} Can not sent friend request twice.`);
 
